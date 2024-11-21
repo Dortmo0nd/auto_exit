@@ -123,42 +123,82 @@ def delete_data(list_of_com):
     for i in selected[::-1]:
         list_of_com.delete(i)
 
-def save_to_file(list_of_com):
+def save_to_file_with_new_command(new_command, list_of_com):
+    """
+    Додає нову команду до файлу та оновлює список команд.
+    """
     try:
-        with open("command_file.txt", 'w', encoding='utf-8') as file:
-            items = list_of_com.get(0, tk.END)
-            for i in items:
-                file.write(i + "\n")
-        file.close()
-    except Exception:
-        messagebox.showerror("Сталась помилка")
+        with open("command_file.txt", "a", encoding="utf-8") as file:
+            file.write(new_command + "\n")
+        list_of_com.insert(tk.END, new_command)
+        messagebox.showinfo("Успіх", f"Команда '{new_command}' додана до файлу.")
+    except Exception as e:
+        messagebox.showerror("Помилка", f"Не вдалося зберегти команду: {e}")
+
 
 def load_from_file(list_of_com):
+    """
+    Завантажує команди з файлу та додає їх у список і систему гарячих клавіш.
+    """
     try:
         with open("command_file.txt", "r", encoding="utf-8") as file:
-            lines = file.readlines()
-            for i in lines:
-                shortcut = i.strip()
+            lines = file.readlines()  # Зчитуємо всі рядки з файлу
+            for line in lines:
+                shortcut = line.strip()  # Видаляємо пробіли та символи нового рядка
+                if not shortcut:  # Пропускаємо порожні рядки
+                    continue
+
+                # Додаємо команду в список
                 list_of_com.insert(tk.END, shortcut)
-            try:
-                kb.add_hotkey(shortcut, lambda: lambda: os.system("shutdown /s /t 1"))
-            except ValueError as e:
-                messagebox.showerror("Помилка", f"Неможливо додати комбінацію {shortcut}")
-        file.close()
+
+                try:
+                    # Уникаємо передчасного виконання команди
+                    kb.add_hotkey(shortcut, lambda sc=shortcut: execute_command(sc))
+                except ValueError as e:
+                    messagebox.showerror("Помилка", f"Неможливо додати комбінацію '{shortcut}': {e}")
 
     except FileNotFoundError:
-        messagebox.showerror("Файл не знайдено")
+        messagebox.showerror("Файл не знайдено", "Файл команд відсутній. Створіть новий або додайте команди.")
+
+
+def execute_command(shortcut):
+    if shortcut:
+        messagebox.showinfo("Ebat ce pracye")
+        # os.system("shutdown /s /t 1")
+
+
 
 def set_command(list_of_com):
-    selected_index =list_of_com.curselection()
+    selected_index = list_of_com.curselection()
 
     if not selected_index:
-        messagebox.showerror("Оберіть команду")
+        messagebox.showerror("Помилка", "Оберіть команду")
         return
 
     selected_text = list_of_com.get(selected_index[0])
+
+    if not check_command_in_file(selected_text):
+        # Запитати користувача, чи хоче він додати цю команду
+        response = messagebox.askyesno("Команда не знайдена", f"Команда '{selected_text}' відсутня у файлі. Додати її?")
+        if response:
+            save_to_file_with_new_command(selected_text, list_of_com)
+        else:
+            return
+
+    # Додаємо гарячу клавішу до системи
     try:
-        kb.add_hotkey(selected_text, lambda: os.system("shutdown /s /t 1"))
-        #kb.add_hotkey(selected_text, lambda: messagebox.showinfo("hello"))
+        # kb.add_hotkey(selected_text, lambda: os.system("shutdown /s /t 1"))
+        messagebox.showinfo("Успіх", f"Команда '{selected_text}' успішно налаштована.")
     except ValueError as e:
-        messagebox.showerror(e)
+        messagebox.showerror("Помилка", f"Неможливо додати комбінацію {selected_text}: {e}")
+
+def check_command_in_file(command):
+    """
+    Перевіряє, чи є команда у файлі. Якщо команди немає, повертає False.
+    """
+    try:
+        with open("command_file.txt", "r", encoding="utf-8") as file:
+            commands = file.read().splitlines()
+            return command in commands
+    except FileNotFoundError:
+        return False

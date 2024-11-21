@@ -1,5 +1,4 @@
 import tkinter as tk
-from logging import disable
 from tkinter import ttk
 import functional as func
 
@@ -8,8 +7,7 @@ import functional as func
 root = tk.Tk()
 
 root.title("Auto exit from Windows")
-icon = tk.PhotoImage(file="Icon.png")
-root.iconphoto(False,icon)
+# root.iconbitmap("Icon.ico")
 root.geometry("310x230")
 root.resizable(width=False, height=False)
 

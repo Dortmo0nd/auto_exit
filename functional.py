@@ -125,7 +125,7 @@ def delete_data(list_of_com):
 
 def save_to_file(list_of_com):
     try:
-        with open("command_file", 'w', encoding='utf-8') as file:
+        with open("command_file.txt", 'w', encoding='utf-8') as file:
             items = list_of_com.get(0, tk.END)
             for i in items:
                 file.write(i + "\n")
@@ -135,7 +135,7 @@ def save_to_file(list_of_com):
 
 def load_from_file(list_of_com):
     try:
-        with open("command_file", "r", encoding="utf-8") as file:
+        with open("command_file.txt", "r", encoding="utf-8") as file:
             lines = file.readlines()
             for i in lines:
                 shortcut = i.strip()

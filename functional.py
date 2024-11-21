@@ -138,8 +138,14 @@ def load_from_file(list_of_com):
         with open("command_file", "r", encoding="utf-8") as file:
             lines = file.readlines()
             for i in lines:
-                list_of_com.insert(tk.END, i.strip())
+                shortcut = i.strip()
+                list_of_com.insert(tk.END, shortcut)
+            try:
+                kb.add_hotkey(shortcut, lambda: lambda: os.system("shutdown /s /t 1"))
+            except ValueError as e:
+                messagebox.showerror("Помилка", f"Неможливо додати комбінацію {shortcut}")
         file.close()
+
     except FileNotFoundError:
         messagebox.showerror("Файл не знайдено")
 
@@ -152,7 +158,7 @@ def set_command(list_of_com):
 
     selected_text = list_of_com.get(selected_index[0])
     try:
-        #kb.add_hotkey(selected_text, lambda: os.system("shutdown /s /t 1"))
-        kb.add_hotkey(selected_text, lambda: messagebox.showinfo("hello"))
+        kb.add_hotkey(selected_text, lambda: os.system("shutdown /s /t 1"))
+        #kb.add_hotkey(selected_text, lambda: messagebox.showinfo("hello"))
     except ValueError as e:
         messagebox.showerror(e)

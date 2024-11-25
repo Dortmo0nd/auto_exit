@@ -251,8 +251,6 @@ def load_settings_from_file(list_of_com):
         list_of_com.insert(tk.END, (setting["keys"], setting["action"]))
         kb.add_hotkey(setting["keys"], lambda sc=setting["keys"], action=setting["action"]: execute_command(sc, action))
 
-    messagebox.showinfo("Завантаження", "Налаштування успішно завантажено")
-
 def execute_command(shortcut, action):
     if shortcut and action:
         if action == "Перезавантаження":

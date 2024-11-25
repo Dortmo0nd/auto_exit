@@ -2,6 +2,35 @@ import tkinter as tk
 from tkinter import ttk
 import functional as func
 
+from pystray import Icon, MenuItem, Menu
+import PIL.Image
+
+
+# Функція для запуску трей-меню
+def setup_tray():
+    def show_window():
+        root.deiconify()  # Показує вікно
+        tray.stop()  # Зупиняє трей
+
+    def exit_app():
+        tray.stop()  # Зупиняє трей
+        root.destroy()  # Закриває програму
+
+    menu = Menu(
+        MenuItem("Відновити", show_window),
+        MenuItem("Вихід", exit_app)
+    )
+
+    # Завантаження іконки для трею
+    icon_image = PIL.Image.open("Icon1.png")
+    tray = Icon("AutoExit", icon_image, "Auto Exit Manager", menu)
+    tray.run()
+
+# Функція для згортання в трей
+def minimize_to_tray():
+    root.withdraw()  # Згортає вікно
+    setup_tray()
+
 # Створення головного вікна
 root = tk.Tk()
 
@@ -40,9 +69,15 @@ exit_btn1.place(x=15, y=185)
 save_btn1 = ttk.Button(root, text="Зберегти", command = lambda: func.save_to_file_with_new_command(list_of_command1))
 save_btn1.place(x=90, y=185)
 
+exit_to_tray_btn = ttk.Button(root, text="Згорнути в трей", command=minimize_to_tray)
+exit_to_tray_btn.place(x = 183, y = 185)
+
 # Прив'язуємо обробники натискання і відпускання клавіш
 root.bind("<KeyPress>", lambda event: func.key_press(event,add_bind1))
 root.bind("<KeyRelease>", lambda event: func.key_release(event,add_bind1))
+root.withdraw()
+root.after(0, setup_tray)
 
 func.load_settings_from_file(list_of_command1)
+
 root.mainloop()

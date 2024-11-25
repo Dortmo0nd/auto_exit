@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="336bbb8f-acfa-4ecb-9f76-688b33ccb3ad" name="Changes" comment="Add control function previous executing">
+    <list default="true" id="336bbb8f-acfa-4ecb-9f76-688b33ccb3ad" name="Changes" comment="Final version">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/command_file.txt" beforeDir="false" afterPath="$PROJECT_DIR$/command_file.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Icon1.jpg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/functional.py" beforeDir="false" afterPath="$PROJECT_DIR$/functional.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -139,7 +139,23 @@
       <option name="project" value="LOCAL" />
       <updated>1732227196324</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Final version">
+      <option name="closed" value="true" />
+      <created>1732557686294</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1732557686294</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Final version">
+      <option name="closed" value="true" />
+      <created>1732564980453</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1732564980453</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -160,6 +176,7 @@
     <MESSAGE value="Update icon" />
     <MESSAGE value="Update icon + command_file" />
     <MESSAGE value="Add control function previous executing" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add control function previous executing" />
+    <MESSAGE value="Final version" />
+    <option name="LAST_COMMIT_MESSAGE" value="Final version" />
   </component>
 </project>

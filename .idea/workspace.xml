@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="336bbb8f-acfa-4ecb-9f76-688b33ccb3ad" name="Changes" comment="Update icon + command_file">
+    <list default="true" id="336bbb8f-acfa-4ecb-9f76-688b33ccb3ad" name="Changes" comment="Add control function previous executing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/command_file.txt" beforeDir="false" afterPath="$PROJECT_DIR$/command_file.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/functional.py" beforeDir="false" afterPath="$PROJECT_DIR$/functional.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -130,7 +131,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732226080084</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Add control function previous executing">
+      <option name="closed" value="true" />
+      <created>1732227196324</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1732227196324</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -150,6 +159,7 @@
     <MESSAGE value="Working version of insert command &#10;&#10;Half working application&#10;&#10;Beta Version application" />
     <MESSAGE value="Update icon" />
     <MESSAGE value="Update icon + command_file" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update icon + command_file" />
+    <MESSAGE value="Add control function previous executing" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add control function previous executing" />
   </component>
 </project>

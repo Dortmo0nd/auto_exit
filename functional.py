@@ -2,8 +2,70 @@ import tkinter as tk
 from tkinter import messagebox
 import os
 import keyboard as kb
+import json
 
 pressed_keys = [] #список для збереження натиснутих клавіш
+added_hotkeys = set()  # Це буде містити всі вже додані гарячі клавіші
+SETTINGS_FILE = "settings.json"
+
+SYSTEM_SHORTCUTS = {
+    # Робота з текстом
+    "ctrl+c",  # Копіювати
+    "ctrl+v",  # Вставити
+    "ctrl+x",  # Вирізати
+    "ctrl+z",  # Скасувати
+    "ctrl+y",  # Повернути дію
+    "ctrl+a",  # Виділити все
+    "ctrl+s",  # Зберегти
+    "ctrl+p",  # Друк
+
+    # Робота з файлами
+    "ctrl+n",  # Новий файл
+    "ctrl+o",  # Відкрити файл
+    "ctrl+shift+s",  # Зберегти як
+    "ctrl+w",  # Закрити вікно/вкладку
+    "ctrl+q",  # Вийти з програми
+
+    # Навігація
+    "alt+tab",  # Перемикання між вікнами
+    "alt+f4",  # Закрити активне вікно
+    "win+tab",  # Перемикання між задачами
+    "ctrl+tab",  # Перемикання між вкладками
+    "ctrl+shift+tab",  # Перемикання назад між вкладками
+
+    # Системні комбінації
+    "ctrl+alt+delete",  # Виклик меню системи
+    "ctrl+shift+esc",  # Виклик диспетчера задач
+    "win+e",  # Провідник
+    "win+d",  # Показати/приховати робочий стіл
+    "win+r",  # Виконати
+    "win+pause",  # Властивості системи
+    "win+l",  # Блокування комп'ютера
+    "win+shift+s",  # Знімок екрана
+
+    # Інтернет браузери
+    "ctrl+t",  # Нова вкладка
+    "ctrl+w",  # Закрити вкладку
+    "ctrl+shift+t",  # Відкрити закриту вкладку
+    "ctrl+l",  # Виділити адресний рядок
+    "ctrl+d",  # Додати в закладки
+    "ctrl+h",  # Історія
+    "ctrl+j",  # Завантаження
+
+    # Редагування
+    "ctrl+f",  # Пошук
+    "ctrl+h",  # Заміна
+    "ctrl+g",  # Перейти до рядка/позиції
+
+    # Медіа
+    "media_play_pause",  # Відтворення/пауза
+    "media_next",  # Наступний трек
+    "media_prev",  # Попередній трек
+    "volume_up",  # Збільшення гучності
+    "volume_down",  # Зменшення гучності
+    "volume_mute",  # Вимкнути звук
+    "shift+alt"
+}
 
 def format_key(keysym):
     """
@@ -94,8 +156,12 @@ def format_key(keysym):
     # Перетворюємо keysym на відповідний формат або повертаємо його без змін
     return mapping.get(keysym, keysym.lower())
 
-def clear_text(btn):
+def is_system_shortCut(shortcut):
+    return shortcut.lower() in SYSTEM_SHORTCUTS
+
+def clear_text(btn, combo_b):
     btn.delete(0,tk.END)
+    combo_b.set('')
     pressed_keys.clear()
 
 def key_press(event, entry_field):
@@ -108,89 +174,97 @@ def key_press(event, entry_field):
     entry_field.delete(0, tk.END)#виводимо комбінацію в текстове поле
     entry_field.insert(0,combo)
 
-def key_release(event, entry_field1):
+def key_release(event, entry_field):
     key = format_key(event.keysym)
     if key in pressed_keys:
-        pressed_keys.remove(event.keysym)  # Видаляємо клавішу, коли вона відпущена
+        pressed_keys.remove(key)  # Видаляємо клавішу, коли вона відпущена
 
-def insert_data(list_of_com, input_data):
-    data = input_data.get()
-    list_of_com.insert(tk.END, data)
+def insert_data(list_of_com, input_data, action_combobox):
+    data = input_data.get().strip()
+    action = action_combobox.get()  # Отримуємо значення з ComboBox
+
+    if not action:
+        messagebox.showerror("Помилка", "Оберіть дію для комбінації")
+        return
+
+    if is_system_shortCut(data):
+        messagebox.showerror("Помилка", f"Комбінація '{data}' є системною та не може бути використана")
+        return
+
+    if data in list_of_com.get(0, tk.END):
+        messagebox.showinfo("Увага", f"Комбінація '{data}' вже є у списку")
+        return
+
+    # Додаємо комбінацію та дію до списку
+    list_of_com.insert(tk.END, (data, action))
+    kb.add_hotkey(data, lambda sc=data, action=action: execute_command(sc, action))
 
 def delete_data(list_of_com):
     selected = list_of_com.curselection()
 
     for i in selected[::-1]:
+        key_action_pair = list_of_com.get(i)
+        shortcut = key_action_pair[0]
+
+        # Видалення гарячої клавіші з реєстрації
+        kb.remove_hotkey(shortcut)
+
+        # Видалення комбінації з файлу
+        remove_command_from_file(shortcut)
+
+        # Видалення комбінації з списку
         list_of_com.delete(i)
 
-def save_to_file_with_new_command(new_command, list_of_com):
-    """
-    Додає нову команду до файлу та оновлює список команд.
-    """
+def remove_command_from_file(command):
     try:
-        with open("command_file.txt", "a", encoding="utf-8") as file:
-            file.write(new_command + "\n")
-        list_of_com.insert(tk.END, new_command)
-        messagebox.showinfo("Успіх", f"Команда '{new_command}' додана до файлу.")
-    except Exception as e:
-        messagebox.showerror("Помилка", f"Не вдалося зберегти команду: {e}")
+        with open("settings.json", "r", encoding="utf-8") as file:
+            commands = file.read().splitlines()
 
+        # Видаляємо команду зі списку
+        commands = [cmd for cmd in commands if cmd != command]
 
-def load_from_file(list_of_com):
-    """
-    Завантажує команди з файлу та додає їх у список і систему гарячих клавіш.
-    """
-    try:
-        with open("command_file.txt", "r", encoding="utf-8") as file:
-            lines = file.readlines()  # Зчитуємо всі рядки з файлу
-            for line in lines:
-                shortcut = line.strip()  # Видаляємо пробіли та символи нового рядка
-                if not shortcut:  # Пропускаємо порожні рядки
-                    continue
-
-                # Додаємо команду в список
-                list_of_com.insert(tk.END, shortcut)
-
-                try:
-                    # Уникаємо передчасного виконання команди
-                    kb.add_hotkey(shortcut, lambda sc=shortcut: execute_command(sc))
-                except ValueError as e:
-                    messagebox.showerror("Помилка", f"Неможливо додати комбінацію '{shortcut}': {e}")
-
+        # Записуємо оновлений список команд назад у файл
+        with open("settings.json", "w", encoding="utf-8") as file:
+            for cmd in commands:
+                file.write(cmd + "\n")
     except FileNotFoundError:
-        messagebox.showerror("Файл не знайдено", "Файл команд відсутній. Створіть новий або додайте команди.")
+        messagebox.showerror("Файл не знайдено", "Файл команд відсутній.")
 
+def save_to_file_with_new_command(list_of_com):
+    settings = []
+    for i in range(list_of_com.size()):
+        key_action_pair = list_of_com.get(i)
+        settings.append({"keys": key_action_pair[0], "action": key_action_pair[1]})
 
-def execute_command(shortcut):
-    if shortcut:
-        messagebox.showinfo("Ebat ce pracye")
-        # os.system("shutdown /s /t 1")
+    with open(SETTINGS_FILE, "w") as file:
+        json.dump(settings, file)
+    messagebox.showinfo("Успіх", "Налаштування успішно збережено")
 
+def load_settings_from_file(list_of_com):
+    if not os.path.exists(SETTINGS_FILE):
+        return  # Якщо файл не існує, нічого не завантажуємо
 
+    with open(SETTINGS_FILE, "r") as file:
+        settings = json.load(file)
 
-def set_command(list_of_com):
-    selected_index = list_of_com.curselection()
+    for setting in settings:
+        list_of_com.insert(tk.END, (setting["keys"], setting["action"]))
+        kb.add_hotkey(setting["keys"], lambda sc=setting["keys"], action=setting["action"]: execute_command(sc, action))
 
-    if not selected_index:
-        messagebox.showerror("Помилка", "Оберіть команду")
-        return
+    messagebox.showinfo("Завантаження", "Налаштування успішно завантажено")
 
-    selected_text = list_of_com.get(selected_index[0])
-
-    if not check_command_in_file(selected_text):
-        # Запитати користувача, чи хоче він додати цю команду
-        response = messagebox.askyesno("Команда не знайдена", f"Команда '{selected_text}' відсутня у файлі. Додати її?")
-        if response:
-            save_to_file_with_new_command(selected_text, list_of_com)
+def execute_command(shortcut, action):
+    if shortcut and action:
+        if action == "Перезавантаження":
+            os.system("shutdown /r /t 1")  # Перезавантаження комп'ютера
+            #messagebox.showinfo("Перезавантаження", "Перезавантаження комп'ютера виконано успішно")
+        elif action == "Вимкнення":
+            os.system("shutdown /s /t 1")  # Вимкнення комп'ютера
+            #messagebox.showinfo("Вимкнення", "Вимкнення комп'ютера виконано успішно")
         else:
-            return
-
-    # Додаємо гарячу клавішу до системи
-    try:
-        # kb.add_hotkey(selected_text, lambda: os.system("shutdown /s /t 1"))
-        messagebox.showinfo("Успіх", f"Команда '{selected_text}' успішно налаштована.")
-    except ValueError as e:
-        messagebox.showerror("Помилка", f"Неможливо додати комбінацію {selected_text}: {e}")
+            messagebox.showinfo("Команда", f"Комбінація {shortcut} з дією '{action}' натискана.")
+    else:
+        messagebox.showerror("Помилка", "Не визначена комбінація чи дія")
 
 def check_command_in_file(command):
     """

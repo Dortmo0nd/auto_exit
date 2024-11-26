@@ -17,7 +17,7 @@ def setup_tray():
         root.destroy()  # Закриває програму
 
     menu = Menu(
-        MenuItem("Відновити", show_window),
+        MenuItem("Відкрити", show_window),
         MenuItem("Вихід", exit_app)
     )
 
@@ -76,7 +76,7 @@ exit_to_tray_btn.place(x = 183, y = 185)
 root.bind("<KeyPress>", lambda event: func.key_press(event,add_bind1))
 root.bind("<KeyRelease>", lambda event: func.key_release(event,add_bind1))
 root.withdraw()
-root.after(0, setup_tray)
+root.after(10, setup_tray)
 
 func.load_settings_from_file(list_of_command1)
 

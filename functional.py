@@ -64,7 +64,7 @@ SYSTEM_SHORTCUTS = {
     "volume_up",  # Збільшення гучності
     "volume_down",  # Зменшення гучності
     "volume_mute",  # Вимкнути звук
-    "shift+alt"
+    "shift+alt",
 }
 
 def format_key(keysym):
